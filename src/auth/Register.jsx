@@ -11,7 +11,7 @@ const Register = () => {
   } = useForm();
   const navigate = useNavigate();
 
-  const { createUser, loading } = useContext(AuthContext);
+  const { createUser, loading, updateUser } = useContext(AuthContext);
 
   const onSubmit = async (data) => {
     data.role = "user";
@@ -21,6 +21,13 @@ const Register = () => {
 
     const res = await createUser(data.email, data.password);
     console.log(res);
+
+    const resUpdateProfile = await updateUser({
+      displayName: data.name,
+      photoURL: data.avatar,
+    });
+    console.log(resUpdateProfile, "resUpdateProfile");
+
     const response = await axios.post(
       "http://localhost:3000/add-new-user",
       data
