@@ -4,6 +4,7 @@ import Login from "../auth/Login";
 import Register from "../auth/Register";
 import Home from "../home/Home";
 import ReportCrime from "../Pages/ReportCrime";
+import CrimeDetailes from "../Pages/CrimeDetailes";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: "/report-crime",
         element: <ReportCrime></ReportCrime>,
+      },
+      {
+        path: "/crime-details/:id",
+        element: <CrimeDetailes></CrimeDetailes>,
       },
     ],
   },

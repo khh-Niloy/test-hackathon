@@ -1,15 +1,35 @@
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const Home = () => {
-  const [allCrime, setallCrime] = useState([]);
 
-  useEffect(() => {
-    axios.get("http://localhost:3000/all-crime").then((res) => {
-      setallCrime(res.data);
+  const { data: allCrime = [], refetch } = useQuery({
+    queryKey: ["all-crime"],
+    queryFn: async () => {
+      const res = await axios.get("http://localhost:3000/all-crime");
+      return res.data;
+    },
+  });
+
+  const handleUpvote = (id) => {
+    axios.patch(`http://localhost:3000/upvote-downvote/${id}`, {
+      user: "upvote",
+    }).then((res) => {
+      console.log(res.data);
+      refetch();
     });
-  }, []);
+  };
+
+  const handleDownvote = (id) => {
+    axios.patch(`http://localhost:3000/upvote-downvote/${id}`, {
+      user: "downvote",
+    }).then((res) => {
+      console.log(res.data);
+      refetch();
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -33,9 +53,9 @@ const Home = () => {
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mt-12">
-          {allCrime.map((crime) => (
+          {allCrime.map((crime, key) => (
             <div
-              key={crime.id}
+              key={key}
               className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
             >
               <div className="relative">
@@ -61,7 +81,11 @@ const Home = () => {
                   </Link>
 
                   <div className="flex gap-3">
-                    <button className="flex-1 px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition-colors duration-300 flex items-center justify-center gap-2">
+                    {}
+                    <button
+                      onClick={() => handleUpvote(crime._id)}
+                      className="flex-1 px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition-colors duration-300 flex items-center justify-center gap-2"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-4 w-4"
@@ -76,7 +100,10 @@ const Home = () => {
                       </svg>
                       {crime.upvotes}
                     </button>
-                    <button className="flex-1 px-4 py-2 bg-rose-500 text-white rounded-lg font-medium hover:bg-rose-600 transition-colors duration-300 flex items-center justify-center gap-2">
+                    <button
+                      onClick={() => handleDownvote(crime._id)}
+                      className="flex-1 px-4 py-2 bg-rose-500 text-white rounded-lg font-medium hover:bg-rose-600 transition-colors duration-300 flex items-center justify-center gap-2"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-4 w-4"
@@ -92,6 +119,7 @@ const Home = () => {
                       {crime.downvotes}
                     </button>
                   </div>
+                  <p>Post Verification Score: {crime.postVerificationScore > 0 ? crime.postVerificationScore : 0}</p>
                 </div>
               </div>
             </div>
